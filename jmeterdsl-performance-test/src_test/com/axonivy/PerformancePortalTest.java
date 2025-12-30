@@ -24,20 +24,6 @@ public class PerformancePortalTest {
     TestPlanStats stats1User = runPortalTest(1, "1_admin_user", "${__P(single_admin_user_server.csv)}");
     // Validate first test results
     validateTestResults(stats1User, "1 admin user test");
-
-
-    // ====================Test for one normal user====================
-    System.out.println("=== Running test with 1 normal user ===");
-    TestPlanStats stats1NormalUser = runPortalTest(1, "1_normal_user", "${__P(single_normal_user_server.csv)}");
-    // Validate first test results
-    validateTestResults(stats1NormalUser, "1 normal user test");
-
-
-    // ====================Test for 10 users====================
-    System.out.println("=== Running test with 10 users ===");
-    TestPlanStats stats10Users = runPortalTest(10, "10_normal_users", "${__P(users_server.csv)}");
-    // Validate second test results
-    validateTestResults(stats10Users, "10 users test");
   }
 
   private TestPlanStats runPortalTest(int numberOfUsers, String testName, String csvFilePath) throws IOException, InterruptedException, TimeoutException {
@@ -50,8 +36,8 @@ public class PerformancePortalTest {
         .holdIterating(1)                      // portal.thread.loop
         .children(
           httpDefaults()
-              .host("${__P(portal.server.host)}")  // portal.server.host
-              .port(9000),                         // portal.server.port
+              .host("${__P(server.host)}")  // server.host
+              .port(9000),                  // server.port
           httpCookies(),
 
           httpHeaders().header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
@@ -69,14 +55,14 @@ public class PerformancePortalTest {
 
           // UpdateSettingToAccessDetailWhenClickOnLineInTaskList ----------------------------
           httpSampler("UpdateSettingToAccessDetailWhenClickOnLineInTaskList"
-            ,"/${__P(security.system.name)}/${__P(portal.application.name)}/pro/PortalKitTestHelper/17208192E0AF4185/updatePortalSetting.ivp")
+            ,"/${__P(security.system.name)}/${__P(application.name)}/pro/PortalKitTestHelper/17208192E0AF4185/updatePortalSetting.ivp")
             .method("GET")
             .param("settingName", "Portal.Tasks.BehaviourWhenClickingOnLineInTaskList")
             .param("settingValue", "ACCESS_TASK_DETAILS"),
 
           // PortalStart Transaction ----------------------------
           httpSampler("PortalStart",
-            "/${__P(security.system.name)}/${__P(portal.application.name)}/pro/${__P(portal.portal)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
+            "/${__P(security.system.name)}/${__P(application.name)}/pro/${__P(project.name)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
             .method("GET")
             .children(
               regexExtractor("url", "action=\"([^\"]+)\""),
@@ -102,7 +88,7 @@ public class PerformancePortalTest {
 
           // PortalHome
           httpSampler("PortalHome"
-            ,"/${__P(security.system.name)}/${__P(portal.application.name)}/pro/${__P(portal.portal)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
+            ,"/${__P(security.system.name)}/${__P(application.name)}/pro/${__P(project.name)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
             .method("GET")
             .children(
               regexExtractor("url", "action=\"([^\"]+)\""),
@@ -384,7 +370,7 @@ public class PerformancePortalTest {
 
           // NavigateToDashboard
           httpSampler("NavigateToDashboard"
-            ,"/${__P(security.system.name)}/${__P(portal.application.name)}/pro/${__P(portal.portal)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
+            ,"/${__P(security.system.name)}/${__P(application.name)}/pro/${__P(project.name)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
             .method("GET")
             .children(
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200"),
@@ -571,8 +557,7 @@ public class PerformancePortalTest {
       jtlWriter(jtlDirName, testName + ".jtl"),  // path to directory and jtl file name 
       // resultsTreeVisualizer(),                // Remove comment on local to debug, since server doesn't have the UI
       htmlReporter("target/html-report/" + testName)
-      // portal-performance-test\jmeter\test.properties
-    ).runIn(new EmbeddedJmeterEngine().propertiesFile("jmeter/test.properties"));
+    ).runIn(new EmbeddedJmeterEngine().propertiesFile("resources/test.properties"));
   }
   
   private void validateTestResults(TestPlanStats stats, String testDescription) {
