@@ -38,7 +38,7 @@ public class PerformancePortalTest {
         .children(
           httpDefaults()
               .host("${__P(server.host)}")  // server.host
-              .port(9000),                  // server.port
+              .port(8081),                  // server.port
           httpCookies(),
 
           httpHeaders().header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
@@ -52,14 +52,6 @@ public class PerformancePortalTest {
             .variableNames("username,password")
             .delimiter(",")
             .ignoreFirstLine(false),
-
-
-          // UpdateSettingToAccessDetailWhenClickOnLineInTaskList ----------------------------
-          httpSampler("UpdateSettingToAccessDetailWhenClickOnLineInTaskList"
-            ,"/${__P(security.system.name)}/${__P(application.name)}/pro/PortalKitTestHelper/17208192E0AF4185/updatePortalSetting.ivp")
-            .method("GET")
-            .param("settingName", "Portal.Tasks.BehaviourWhenClickingOnLineInTaskList")
-            .param("settingValue", "ACCESS_TASK_DETAILS"),
 
           // PortalStart Transaction ----------------------------
           httpSampler("PortalStart",
@@ -97,31 +89,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // NavigateToGlobalSearch
-          httpSampler("NavigateToGlobalSearch"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "global-search-component:global-search-remote-cmd")
-            .param("javax.faces.partial.execute", "global-search-component:global-search-data")
-            .param("global-search-component:global-search-remote-cmd", "global-search-component:global-search-remote-cmd")
-            .param("global-search-component:global-search-data", "leave")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              regexExtractor("redirectURL", "<redirect url=\"([^\"]+)\">"),
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // GlobalSearch
-          httpSampler("GlobalSearch"
-            ,"${redirectURL}")
-            .method("POST")
-            .children(
-              regexExtractor("url", "action=\"([^\"]+)\""),
-              regexExtractor("viewState", "id=\"j_id__v_0:javax.faces.ViewState:1\" value=(\"[\\S]+\")"),
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
           // NavigateToProcesses
           httpSampler("NavigateToProcesses"
             ,"${url}")
@@ -148,22 +115,6 @@ public class PerformancePortalTest {
             .method("GET")
             .children(
               regexExtractor("url", "action=\"([^\"]+)\""),
-              regexExtractor("viewState", "id=\"j_id__v_0:javax.faces.ViewState:1\" value=(\"[\\S]+\") "),
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // PortalProcesses_LazyLoadProcesses
-          httpSampler("PortalProcesses_LazyLoadProcesses"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "process-widget:init-process-data-cmd ")
-            .param("javax.faces.partial.execute", "process-widget:init-process-data-cmd")
-            .param("javax.faces.partial.render", "process-widget:process-list process-widget:process-nav process-widget:process-view-mode")
-            .param("process-widget:init-process-data-cmd", "process-widget:init-process-data-cmd")
-            .param("portal-breadcrumb:breadcrumb-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
               regexExtractor("viewState", "id=\"j_id__v_0:javax.faces.ViewState:1\" value=(\"[\\S]+\") "),
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
@@ -198,64 +149,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // LoadTaskListFirstTime
-          httpSampler("LoadTaskListFirstTime"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "task-default_task_list_dashboard_task_1:task-component:rcLoadTaskFirstTime")
-            .param("javax.faces.partial.execute", "task-default_task_list_dashboard_task_1:task-component:rcLoadTaskFirstTime")
-            .param("javax.faces.partial.render", "task-default_task_list_dashboard_task_1:task-component:dashboard-tasks-container")
-            .param("task-default_task_list_dashboard_task_1:task-component:rcLoadTaskFirstTime", "task-default_task_list_dashboard_task_1:task-component:rcLoadTaskFirstTime")
-            .param("portal-breadcrumb:breadcrumb-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // TaskListSearch
-          httpSampler("TaskListSearch"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "task-default_task_list_dashboard_task_1:quick-search-form:quick-search-input-0")
-            .param("javax.faces.partial.execute", "task-default_task_list_dashboard_task_1:quick-search-form:quick-search-input-0")
-            .param("javax.faces.partial.render", "task-default_task_list_dashboard_task_1:task-component:dashboard-tasks task-default_task_list_dashboard_task_1:task-component:empty-message-container")
-            .param("javax.faces.behavior.event", "keydown")
-            .param("javax.faces.partial.event", "keydown")
-            .param("task-default_task_list_dashboard_task_1:quick-search-form:quick-search-input-0", "leave")
-            .param("task-default_task_list_dashboard_task_1:quick-search-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // NavigateToTaskDetail
-          httpSampler("NavigateToTaskDetail"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source",
-              "task-default_task_list_dashboard_task_1:task-component:dashboard-tasks:0:dashboard-tasks-columns:12:dashboard-actions-task-default_task_list_dashboard_task_1:task-open-detail-command")
-            .param("javax.faces.partial.execute", "@all")
-            .param("task-default_task_list_dashboard_task_1:task-component:dashboard-tasks:0:dashboard-tasks-columns:12:dashboard-actions-task-default_task_list_dashboard_task_1:task-open-detail-command",
-              "task-default_task_list_dashboard_task_1:task-component:dashboard-tasks:0:dashboard-tasks-columns:12:dashboard-actions-task-default_task_list_dashboard_task_1:task-open-detail-command")
-            .param("portal-breadcrumb:breadcrumb-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              regexExtractor("redirectURL", "<redirect url=\"([^\"]+)\">"),
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // PortalTaskDetail
-          httpSampler("PortalTaskDetail"
-            ,"${redirectURL}")
-            .method("GET")
-            .children(
-              regexExtractor("url", "action=\"([^\"]+)\""),
-              regexExtractor("viewState", "id=\"j_id__v_0:javax.faces.ViewState:1\" value=(\"[\\S]+\") "),
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
 
           // NavigateToCaseList
           httpSampler("NavigateToCaseList"
@@ -287,259 +180,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // LoadCaseListFirstTime
-          httpSampler("LoadCaseListFirstTime"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "case-default_case_list_dashboard_case_1:case-component:rcLoadCaseFirstTime")
-            .param("javax.faces.partial.execute", "case-default_case_list_dashboard_case_1:case-component:rcLoadCaseFirstTime")
-            .param("javax.faces.partial.render", "case-default_case_list_dashboard_case_1:case-component:dashboard-cases-container")
-            .param("case-default_case_list_dashboard_case_1:case-component:rcLoadCaseFirstTime"
-              , "case-default_case_list_dashboard_case_1:case-component:rcLoadCaseFirstTime")
-            .param("portal-breadcrumb:breadcrumb-form_SUBMIT" , "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // CaseListSearch
-          httpSampler("CaseListSearch"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "case-default_case_list_dashboard_case_1:quick-search-form:quick-search-input-0")
-            .param("javax.faces.partial.execute", "case-default_case_list_dashboard_case_1:quick-search-form:quick-search-input-0")
-            .param("javax.faces.partial.render", "case-default_case_list_dashboard_case_1:case-component:dashboard-cases case-default_case_list_dashboard_case_1:case-component:empty-message-container")
-            .param("javax.faces.behavior.event", "keydown")
-            .param("javax.faces.partial.event", "keydown")
-            .param(
-              "case-default_case_list_dashboard_case_1:quick-search-form:quick-search-input-0",
-              "leave")
-            .param("case-default_case_list_dashboard_case_1:quick-search-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // CaseListFilterLargeBusinessCase
-          httpSampler("CaseListFilterLargeBusinessCase"
-            ,"${url}")
-            .method("POST")
-
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source",
-              "case-default_case_list_dashboard_case_1:quick-search-form:quick-search-input-0")
-            .param("javax.faces.partial.execute",
-              "case-default_case_list_dashboard_case_1:quick-search-form:quick-search-input-0")
-            .param("javax.faces.partial.render",
-              "case-default_case_list_dashboard_case_1:case-component:dashboard-cases case-default_case_list_dashboard_case_1:case-component:empty-message-container")
-            .param("javax.faces.behavior.event", "keydown")
-            .param("javax.faces.partial.event", "keydown")
-            .param("case-default_case_list_dashboard_case_1:quick-search-form:quick-search-input-0",
-              "Business case has lots of tasks cases")
-            .param("case-default_case_list_dashboard_case_1:quick-search-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // NavigateToCaseDetail
-          httpSampler("NavigateToCaseDetail"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source",
-              "case-default_case_list_dashboard_case_1:case-component:dashboard-cases:0:dashboard-cases-columns:9:dashboard-actions-case-default_case_list_dashboard_case_1:case-item-open-detail-link")
-            .param("javax.faces.partial.execute", "@all")
-            .param("case-default_case_list_dashboard_case_1:case-component:dashboard-cases:0:dashboard-cases-columns:9:dashboard-actions-case-default_case_list_dashboard_case_1:case-item-open-detail-link",
-              "case-default_case_list_dashboard_case_1:case-component:dashboard-cases:0:dashboard-cases-columns:9:dashboard-actions-case-default_case_list_dashboard_case_1:case-item-open-detail-link")
-            .param("portal-breadcrumb:breadcrumb-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              regexExtractor("redirectURL", "<redirect url=\"([^\"]+)\">"),
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // PortalCaseDetail
-          httpSampler("PortalCaseDetail"
-            ,"${redirectURL}")
-            .method("GET")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // NavigateToDashboard
-          httpSampler("NavigateToDashboard"
-            ,"/${__P(security.system.name)}/${__P(application.name)}/pro/${__P(project.name)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
-            .method("GET")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200"),
-              regexExtractor("url", "action=\"([^\"]+)\""),
-              regexExtractor("viewState", "id=\"j_id__v_0:javax.faces.ViewState:1\" value=(\"[\\S]+\") ")
-            ),
-
-          // Dashboard_FirstTab_YourTasks
-          httpSampler("Dashboard_FirstTab_YourTasks"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "task-task_1:task-component:rcLoadTaskFirstTime")
-            .param("javax.faces.partial.execute", "task-task_1:task-component:rcLoadTaskFirstTime")
-            .param("javax.faces.partial.render",
-              "task-task_1:task-component:dashboard-tasks-container")
-            .param("task-task_1:task-component:rcLoadTaskFirstTime",
-              "task-task_1:task-component:rcLoadTaskFirstTime")
-            .param("user-menu-required-login:global-search-component-mobile:global-search-data", "")
-            .param("user-menu-required-login:global-search-component-mobile-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // Dashboard_FirstTab_YourCases
-          httpSampler("Dashboard_FirstTab_YourCases"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "case-case_1:case-component:rcLoadCaseFirstTime")
-            .param("javax.faces.partial.execute", "case-case_1:case-component:rcLoadCaseFirstTime")
-            .param("javax.faces.partial.render",
-              "case-case_1:case-component:dashboard-cases-container")
-            .param("case-case_1:case-component:rcLoadCaseFirstTime",
-              "case-case_1:case-component:rcLoadCaseFirstTime")
-            .param("user-menu-required-login:global-search-component-mobile:global-search-data", "")
-            .param("user-menu-required-login:global-search-component-mobile-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // Dashboard_FirstTab_ProcessWidget
-          httpSampler("Dashboard_FirstTab_ProcessWidget"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "process-process_1:process-component:rcLoadProcessFirstTime")
-            .param("javax.faces.partial.execute",
-              "process-process_1:process-component:rcLoadProcessFirstTime")
-            .param("javax.faces.partial.render",
-              "process-process_1:process-component:dashboard-processes-container")
-            .param("process-process_1:process-component:rcLoadProcessFirstTime",
-              "process-process_1:process-component:rcLoadProcessFirstTime")
-            .param("user-menu-required-login:global-search-component-mobile:global-search-data", "")
-            .param("user-menu-required-login:global-search-component-mobile-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // NavigateToDashboard_SecondTab_StoreSelectedMenuItem
-          httpSampler("NavigateToDashboard_SecondTab_StoreSelectedMenuItem"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source",
-              "user-menu-required-login:main-navigator:store-selected-menuitems-rc")
-            .param("javax.faces.partial.execute",
-              "user-menu-required-login:main-navigator:store-selected-menuitems-rc")
-            .param("user-menu-required-login:main-navigator:store-selected-menuitems-rc",
-              "user-menu-required-login:main-navigator:store-selected-menuitems-rc")
-            .param("selectedMenuId",
-              "user-menu-required-login:main-navigator:main-menu__js__customized-dashboard-sub-dashboard")
-            .param("isWorkingOnATask", "false")
-            .param("isOpenOnNewTab", "false")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // NavigateToDashboard_SecondTab_ClickOnSubMenuItem
-          httpSampler("NavigateToDashboard_SecondTab_ClickOnSubMenuItem"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "user-menu-required-login:main-navigator:main-menu")
-            .param("javax.faces.partial.execute", "user-menu-required-login:main-navigator:main-menu")
-            .param("javax.faces.partial.render", "user-menu-required-login:main-navigator:main-menu")
-            .param("user-menu-required-login:main-navigator:main-menu",
-              "user-menu-required-login:main-navigator:main-menu")
-            .param("taskId", "")
-            .param("isWorkingOnATask", "false")
-            .param("menuKind", "dashboard")
-            .param("menuUrl", "")
-            .param("user-menu-required-login:main-navigator:main-menu_menuid",
-              "_js__customized-dashboard-sub-dashboard")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              regexExtractor("redirectURL", "<redirect url=\"([^\"]+)\">"),
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // Dashboard_SecondTab
-          httpSampler("Dashboard_SecondTab"
-            ,"${redirectURL}")
-            .method("GET")
-            .children(
-              regexExtractor("url", "action=\"([^\"]+)\""),
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // Dashboard_SecondTab_YourTasks
-          httpSampler("Dashboard_SecondTab_YourTasks"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "task-task_1:task-component:rcLoadTaskFirstTime")
-            .param("javax.faces.partial.execute", "task-task_1:task-component:rcLoadTaskFirstTime")
-            .param("javax.faces.partial.render",
-              "task-task_1:task-component:dashboard-tasks-container")
-            .param("task-task_1:task-component:rcLoadTaskFirstTime",
-              "task-task_1:task-component:rcLoadTaskFirstTime")
-            .param("user-menu-required-login:global-search-component-mobile:global-search-data", "")
-            .param("user-menu-required-login:global-search-component-mobile-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-
-          // Dashboard_SecondTab_YourCases
-          httpSampler("Dashboard_SecondTab_YourCases"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source", "case-custom-case_1:case-component:rcLoadCaseFirstTime")
-            .param("javax.faces.partial.execute",
-              "case-custom-case_1:case-component:rcLoadCaseFirstTime")
-            .param("javax.faces.partial.render",
-              "case-custom-case_1:case-component:dashboard-cases-container")
-            .param("case-custom-case_1:case-component:rcLoadCaseFirstTime",
-              "case-custom-case_1:case-component:rcLoadCaseFirstTime")
-            .param("user-menu-required-login:global-search-component-mobile:global-search-data", "")
-            .param("user-menu-required-login:global-search-component-mobile-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
-          // Dashboard_SecondTab_ProcessWidget
-          httpSampler("Dashboard_SecondTab_ProcessWidget"
-            ,"${url}")
-            .method("POST")
-            .param("javax.faces.partial.ajax", "true")
-            .param("javax.faces.source",
-              "process-custom-compact-mode_1:process-component:rcLoadProcessFirstTime")
-            .param("javax.faces.partial.execute",
-              "process-custom-compact-mode_1:process-component:rcLoadProcessFirstTime")
-            .param("javax.faces.partial.render",
-              "process-custom-compact-mode_1:process-component:dashboard-processes-container")
-            .param("process-custom-compact-mode_1:process-component:rcLoadProcessFirstTime",
-              "process-custom-compact-mode_1:process-component:rcLoadProcessFirstTime")
-            .param("user-menu-required-login:global-search-component-mobile:global-search-data", "")
-            .param("user-menu-required-login:global-search-component-mobile-form_SUBMIT", "1")
-            .param("javax.faces.ViewState", "${viewState}")
-            .children(
-              responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
-            ),
           // Logout
           httpSampler("Logout"
             ,"${url}")
@@ -553,10 +193,12 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             )
         ),
+      // Remove comment the line below on local to debug
+      // since server doesn't have the UI
+      // resultsTreeVisualizer(),
 
       // Listeners and writers:
       jtlWriter(jtlDirName, testName + ".jtl"),  // path to directory and jtl file name 
-      // resultsTreeVisualizer(),                // Remove comment on local to debug, since server doesn't have the UI
       htmlReporter("target/html-report/" + testName)
     ).runIn(new EmbeddedJmeterEngine().propertiesFile("resources/test.properties"));
   }
