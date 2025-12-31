@@ -9,10 +9,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 import static us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class DemoTest {
 
