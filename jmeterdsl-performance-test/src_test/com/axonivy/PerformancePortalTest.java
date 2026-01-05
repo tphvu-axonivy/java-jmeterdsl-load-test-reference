@@ -193,8 +193,7 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             )
         ),
-      // Remove comment the line below on local to debug
-      // since server doesn't have the UI
+      // Remove comment the line below on local environment to debug
       // resultsTreeVisualizer(),
 
       // Listeners and writers:
