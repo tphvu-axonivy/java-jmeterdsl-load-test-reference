@@ -22,7 +22,7 @@ public class PerformancePortalTest {
   public void testPortalWalkthrough() throws IOException, InterruptedException, TimeoutException {
     // ====================Test one admin user====================
     System.out.println("=== Running test with 1 admin user ===");
-    TestPlanStats stats1User = runPortalTest(1, "1_admin_user", "${__P(single_admin_user_server.csv)}");
+    TestPlanStats stats1User = runPortalTest(1, "1_admin_user", "${__P(one_user.csv)}");
     // Validate first test results
     validateTestResults(stats1User, "1 admin user test");
   }
