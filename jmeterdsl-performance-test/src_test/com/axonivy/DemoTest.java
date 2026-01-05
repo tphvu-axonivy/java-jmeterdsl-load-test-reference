@@ -1,6 +1,5 @@
 package com.axonivy;
 
-import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
 
 import java.io.IOException;
@@ -21,10 +20,10 @@ public class DemoTest {
     String jtlDirName = String.format("target/jtls/%s", timestamp);
     String testName = "axonivy-website-test";
     
-    TestPlanStats stats = testPlan(
+    testPlan(
       threadGroup("Test Axon Ivy Website")
-        .rampTo(1, Duration.ofSeconds(1))  // 1 user, 1 second ramp-up
-        .holdIterating(1)                   // 1 iteration
+        .rampTo(1, Duration.ofSeconds(1))
+        .holdIterating(1)
         .children(
             httpHeaders().header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
             .header("Accept-Encoding", "gzip, deflate, br")
@@ -49,11 +48,10 @@ public class DemoTest {
             )
           ),
       // Remove comment the line below on local to debug
-      // since server doesn't have the UI
       // resultsTreeVisualizer(),
 
       // Listeners and writers:
-      jtlWriter(jtlDirName, testName + ".jtl"),  // path to directory and jtl file name
+      jtlWriter(jtlDirName, testName + ".jtl"),
       htmlReporter("target/html-report/" + testName)
     ).runIn(new EmbeddedJmeterEngine());
   }

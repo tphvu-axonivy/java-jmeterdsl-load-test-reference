@@ -21,24 +21,22 @@ public class PerformancePortalTest {
   @Test
   public void testPortalWalkthrough() throws IOException, InterruptedException, TimeoutException {
     // ====================Test one admin user====================
-    System.out.println("=== Running test with 1 admin user ===");
-    TestPlanStats stats1User = runPortalTest(1, "1_admin_user", "${__P(one_user.csv)}");
-    // Validate first test results
+    TestPlanStats stats1User = runPortalTest(1, 1,"1_admin_user", "${__P(one_user.csv)}");
     validateTestResults(stats1User, "1 admin user test");
   }
 
-  private TestPlanStats runPortalTest(int numberOfUsers, String testName, String csvFilePath) throws IOException, InterruptedException, TimeoutException {
+  private TestPlanStats runPortalTest(int numberOfUsers, int rampUpPeriod, String testName, String csvFilePath) throws IOException, InterruptedException, TimeoutException {
     String jtlDirName = String.format("target/jtls/%s", timestamp);
 
     return testPlan(
       threadGroup(testName)
         .rampTo(numberOfUsers,                 // Number of users
-          Duration.ofSeconds(numberOfUsers))   // Ramp up time (1 second per user)
+          Duration.ofSeconds(rampUpPeriod))    // Ramp up period
         .holdIterating(1)                      // portal.thread.loop
         .children(
           httpDefaults()
-              .host("${__P(server.host)}")  // server.host
-              .port(8081),                  // server.port
+              .host("${__P(server.host)}")
+              .port(8081),
           httpCookies(),
 
           httpHeaders().header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
@@ -53,7 +51,6 @@ public class PerformancePortalTest {
             .delimiter(",")
             .ignoreFirstLine(false),
 
-          // PortalStart Transaction ----------------------------
           httpSampler("PortalStart",
             "/${__P(security.system.name)}/${__P(application.name)}/pro/${__P(project.name)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
             .method("GET")
@@ -62,7 +59,6 @@ public class PerformancePortalTest {
               regexExtractor("viewState", "id=\"j_id__v_0:javax.faces.ViewState:1\" value=(\"[\\S]+\") ")
             ),
 
-          // Login
           httpSampler("Login"
             ,"${url}")
             .method("POST")
@@ -79,7 +75,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // PortalHome
           httpSampler("PortalHome"
             ,"/${__P(security.system.name)}/${__P(application.name)}/pro/${__P(project.name)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
             .method("GET")
@@ -89,7 +84,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // NavigateToProcesses
           httpSampler("NavigateToProcesses"
             ,"${url}")
             .method("POST")
@@ -109,7 +103,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // PortalProcesses
           httpSampler("PortalProcesses"
             ,"${redirectURL}")
             .method("GET")
@@ -119,7 +112,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // NavigateToTaskList
           httpSampler("NavigateToTaskList"
             ,"${url}")
             .method("POST")
@@ -139,7 +131,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // PortalTaskList
           httpSampler("PortalTaskList"
             ,"${redirectURL}")
             .method("GET")
@@ -150,7 +141,6 @@ public class PerformancePortalTest {
             ),
 
 
-          // NavigateToCaseList
           httpSampler("NavigateToCaseList"
             ,"${url}")
             .method("POST")
@@ -170,7 +160,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // PortalCaseList
           httpSampler("PortalCaseList"
             ,"${redirectURL}")
             .method("GET")
@@ -180,7 +169,6 @@ public class PerformancePortalTest {
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             ),
 
-          // Logout
           httpSampler("Logout"
             ,"${url}")
             .method("POST")
@@ -196,8 +184,7 @@ public class PerformancePortalTest {
       // Remove comment the line below on local environment to debug
       // resultsTreeVisualizer(),
 
-      // Listeners and writers:
-      jtlWriter(jtlDirName, testName + ".jtl"),  // path to directory and jtl file name 
+      jtlWriter(jtlDirName, testName + ".jtl"),
       htmlReporter("target/html-report/" + testName)
     ).runIn(new EmbeddedJmeterEngine().propertiesFile("resources/test.properties"));
   }
