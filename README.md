@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project implements performance testing for <your_project_application> using **JMeter Java DSL**, a modern Java-based approach to performance testing that provides a fluent API for creating JMeter test plans programmatically. The JMeter Java DSL eliminates the need for XML-based test plans by allowing you to write tests in pure Java code, making them more maintainable, version-controllable, and easier to integrate into CI/CD pipelines.
+This project is providing demo performance tests as a reference for your project using **JMeter Java DSL**, a modern Java-based approach to performance testing that provides a fluent API for creating JMeter test plans programmatically. The JMeter Java DSL eliminates the need for XML-based test plans by allowing you to write tests in pure Java code, making them more maintainable, version-controllable, and easier to integrate into CI/CD pipelines.
 
 ### Key Benefits of JMeter Java DSL:
 - **Type Safety**: Compile-time validation of test plans
@@ -14,12 +14,12 @@ This project implements performance testing for <your_project_application> using
 
 ```
 <your_project_application>-performance-test/
-├── src_test/com/axonivy/<your_project_application>/
-│   └── Performance<your_project_application>Test.java    # Main test class
-├── jmeter/
-│   ├── test.properties               # Configuration properties
-│   └── <credentials>.csv             # User credentials for server testing
-│                                     # In <your_project_application>, we use it with Jenkins credentials
+├── src_test/com/axonivy/
+│   └── <your_project_application>Test.java    # Main test class
+├── resources/
+│   ├── test.properties             # Configuration properties
+│   └── <file_name>.csv             # User credentials for server testing
+│                                   # In <your_project_application>, we use it with Jenkins credentials
 └── target/
     └── jtls/                         # JTL result files
 ```
@@ -32,37 +32,26 @@ The test configuration is managed through `test.properties` file. Here are the k
 
 ### Server Properties
 ```properties
-# Security System name (empty for local, "<your_project_application>" for server)
-security.system.name=<your_project_application>
+# Security System name
+# Depends on server setup
+# Keep it empty on local environment
+security.system.name=
 
-# Application and <your_project_application> names
-<your_project_application>.application.name=<your_project_application>
-<your_project_application>.<your_project_application>=<your_project_application>
+# Application name
+application.name=designer
 
-# Server configuration
-<your_project_application>.server.host=<your_project_application>01.server.ivy-cloud.com
-<your_project_application>.server.port=9000
-```
+# Project name
+project.name=<your_project_name>
 
-### Performance Thresholds
-```properties
-# Response time expectations (in milliseconds)
-<your_project_application>.duration.normal=2000    # Normal page load time
-<your_project_application>.duration.ajax=500       # AJAX request time
-```
+# Server host
+server.host=localhost
 
-### Thread Configuration
-```properties
-# Load testing parameters
-<your_project_application>.thread.numberOfUser=10  # Number of concurrent users
-<your_project_application>.thread.rampup=10        # Ramp-up time in seconds
-<your_project_application>.thread.loop=1           # Number of iterations per user
 ```
 
 ### CSV Data Files
 ```properties
-# User credential files
-<your_credentials_file>.csv=jmeter/data/<your_credentials_file>.csv
+##### CSV file for user
+one_user.csv=resources/<file_name>.csv
 ```
 
 ## CSV Data Configuration
@@ -82,7 +71,7 @@ username3,password3
 csvDataSet(csvFilePath)
   .variableNames("username,password")  // Define column names
   .delimiter(",")                      // CSV delimiter
-  .ignoreFirstLine(false)             // Set to true if CSV has headers
+  .ignoreFirstLine(false)              // Set to true if CSV has headers
 ```
 
 ## Credential Security Management
@@ -91,7 +80,7 @@ csvDataSet(csvFilePath)
 
 Your credential files contain sensitive information and should **never** be committed to version control. Here are several approaches to manage them securely:
 
-> **📝 Note:** This is just the example how files are currently being used in <your_project_application> projects. There're multiple ways to handle Credentials, other solutions are possible.
+> **📝 Note:** This is just the example how files are currently being used in a project. There're multiple ways to handle Credentials, other solutions are possible.
 
 **Jenkins Secret Files**
 1. Go to Jenkins → Manage Jenkins → Manage Credentials
@@ -110,7 +99,7 @@ pipeline {
           ]) {
             // Copy credential files to expected locations
             sh '''
-              cp "$YOUR_CREDENTIALS_CSV" "${jmeterDslSourceDir}/jmeter/data/your_credentials.csv"
+              cp "$YOUR_CREDENTIALS_CSV" "$<path_to_your_csv_file>"
             '''
           }
         }
@@ -134,33 +123,12 @@ pipeline {
 6. **Use least privilege** principle for test accounts
 7. **Monitor test executions** for suspicious activity
 
-### Troubleshooting Credential Issues
-
-**File Not Found Errors:**
-```bash
-# Check if files exist
-ls -la src/test/resources/*.csv
-
-# Verify file permissions
-chmod 644 src/test/resources/*.csv
-```
-
-**Authentication Failures:**
-- Verify credentials are correct and not expired
-- Check if test accounts are locked
-- Ensure proper CSV format (no extra spaces, correct delimiter)
-
-**Jenkins Integration Issues:**
-- Verify credential IDs match in Jenkinsfile
-- Check file paths are correct for your OS
-- Ensure Jenkins has read access to credential files
-
 ## HTTP Samplers Examples
 
 ### Basic HTTP Sampler
 ```java
-httpSampler("<your_project_application>Start",
-  "/${__P(security.system.name)}/${__P(<your_project_application>.application.name)}/pro/${__P(<your_project_application>.<your_project_application>)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
+httpSampler("ProjectStart",
+  "/${__P(security.system.name)}/${__P(application.name)}/pro/${__P(project.name)}/1549F58C18A6C562/DefaultApplicationHomePage.ivp")
   .method("GET")
 ```
 
@@ -175,22 +143,12 @@ httpSampler("Login", "${url}")
   .param("javax.faces.ViewState", "${viewState}")
 ```
 
-### HTTP Sampler with GET Parameters
-```java
-httpSampler("UpdateSettingToAccessDetailWhenClickOnLineInTaskList",
-  "/${__P(security.system.name)}/${__P(<your_project_application>.application.name)}/pro/<your_project_application>KitTestHelper/17208192E0AF4185/update<your_project_application>Setting.ivp")
-  .method("GET")
-  .param("settingName", "<your_project_application>.Tasks.BehaviourWhenClickingOnLineInTaskList")
-  .param("settingValue", "ACCESS_TASK_DETAILS")
-```
-
 ## Passing Values and Variables
 
-### Using Properties from test.properties
+### Using properties from test.properties file
 Use the `${__P(property.name)}` syntax to reference properties:
 ```java
-.host("${__P(<your_project_application>.server.host)}")           // Gets <your_project_application>.server.host from properties
-.param("settingName", "${__P(setting.name)}") // Property in parameter value
+.host("${__P(server.host)}") // Gets server.host value from the file
 ```
 
 ### Using Variables from CSV Data
@@ -203,8 +161,8 @@ Reference CSV column names as variables:
 ### Using Extracted Variables
 Variables extracted by regex extractors can be used in subsequent requests:
 ```java
-httpSampler("Login", "${url}")                    // Uses extracted 'url' variable
-.param("javax.faces.ViewState", "${viewState}")   // Uses extracted 'viewState' variable
+httpSampler("Login", "${url}")  // Uses extracted 'url' variable
+  .param("javax.faces.ViewState", "${viewState}")  // Uses extracted 'viewState' variable
 ```
 
 ## Regular Expression Extractors
@@ -218,11 +176,10 @@ Extractors capture values from HTTP responses for use in subsequent requests:
   regexExtractor("viewState", "id=\"j_id__v_0:javax.faces.ViewState:1\" value=(\"[\\S]+\") ")  // Extract ViewState
 )
 ```
-
 ### Redirect URL Extractor
 ```java
 .children(
-  regexExtractor("redirectURL", "<redirect url=\"([^\"]+)\">")     // Extract redirect URL from response
+  regexExtractor("redirectURL", "<redirect url=\"([^\"]+)\">")  // Extract redirect URL from response
 )
 ```
 
@@ -279,15 +236,15 @@ Response assertions validate that HTTP requests return expected results:
 ### Thread Group Configuration
 ```java
 threadGroup("test_name")
-  .rampTo(numberOfUsers, Duration.ofSeconds(numberOfUsers))  // Ramp up users
-  .holdIterating(1)                                          // Number of iterations
+  .rampTo(numberOfUsers, Duration.ofSeconds(rampUpPeriod))
+  .holdIterating(1)
 ```
 
 ### HTTP Defaults
 ```java
 httpDefaults()
-  .host("${__P(<your_project_application>.server.host)}")  // Default host for all requests
-  .port(9000)                          // Default port for all requests
+  .host("${__P(server.host)}")  // Default host for all requests
+  .port(8081) // Default port for all requests
 ```
 
 ### HTTP Headers
@@ -317,67 +274,26 @@ resultsTreeVisualizer()  // Uncomment for local debugging only
 
 ## Running the Tests
 
-### Prerequisites
-1. Java 11 or higher
-2. Maven
-3. Access to the target <your_project_application> server
-
 ### Execution Commands
 ```bash
 # Run all tests
-mvn test
+mvn clean test -Dtest=DemoTest
+# or run demo Portal test (you'll need a few manual steps to set up)
+# mvn clean test -Dtest=PerformancePortalTest
 ```
-
-### Test Validation
-The test automatically validates results and fails if:
-- Error count > 0
-- Response codes are not as expected (non-200)
-- Assertions fail
-
-### Example Test Output
-```
-=== Running test with 1 admin user ===
-1 admin user test completed successfully: 45 samples, 0 errors
-=== Running test with 1 normal user ===
-1 normal user test completed successfully: 45 samples, 0 errors
-=== Running test with 10 users ===
-10 users test completed successfully: 450 samples, 0 errors
-```
-
-## Best Practices
-
-1. **Property Externalization**: Use properties files for environment-specific values
-2. **Data-Driven Testing**: Use CSV files for user credentials and test data
-3. **Response Validation**: Always include response assertions
-4. **Variable Extraction**: Extract dynamic values like ViewState and form URLs
-5. **Correlation**: Use extracted variables to handle dynamic content
-6. **Cookie Management**: Enable automatic cookie handling for session management
-7. **Reporting**: Generate JTL files and HTML reports for analysis (currently we don't using HTML reports)
-8. **Error Handling**: Implement proper test validation and failure handling
 
 ## Quick Setup Guide
-
-### For Local Development
-
 1. **Clone the repository**
-2. **Set up credentials** (choose one):
-3. **Configure test properties** (if needed)
-   ```bash
-   # Edit server settings
-   notepad src/test/resources/test.properties
-   ```
-
-4. **Run tests**
-   ```bash
-   mvn test
-   ```
-
-### For Jenkins CI/CD
-
-1. **Set up credential files in Jenkins** (see detailed instructions above)
-2. **Use the provided Jenkinsfile** for pipeline configuration
-3. **Configure build parameters** as needed
-4. **Run the pipeline**
+2. **Run the test**
+```bash
+mvn clean test -Dtest=DemoTest
+# mvn clean test -Dtest=PerformancePortalTest
+```
+If you want to run `PerformancePortalTest` then you'll need to do these following steps:
+- Open the code with Axon Ivy Designer
+- Get Portal app from Axon Ivy Market (only Portal is enough). Portal version should be compatible with Designer version
+- Update user credential in `one_user.csv` file like Portal app
+- Run the test with the commented command from step 2
 
 ## Troubleshooting
 
@@ -388,4 +304,4 @@ The test automatically validates results and fails if:
 4. **Connection Errors**: Verify server host and port configuration
 
 ### Debug Mode:
-Uncomment `resultsTreeVisualizer()` for detailed request/response inspection during local development.
+Uncomment `resultsTreeVisualizer()` for detailed request/response inspection during local development. (see `PerformancePortalTest`)
