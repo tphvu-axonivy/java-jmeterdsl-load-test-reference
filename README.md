@@ -13,22 +13,21 @@ This project is providing demo performance tests as a reference for your project
 ## Project Structure
 
 ```
-<your_project_application>-performance-test/
+<your_project_application>/
 ├── src_test/com/axonivy/
 │   └── <your_project_application>Test.java    # Main test class
+│
 ├── resources/
-│   ├── test.properties             # Configuration properties
-│   └── <file_name>.csv             # User credentials for server testing
-│                                   # In <your_project_application>, we use it with Jenkins credentials
+│   ├── test.properties # Configuration properties
+│   └── <file_name>.csv # User credentials for testing
+│
 └── target/
-    └── jtls/                         # JTL result files
+    └── jtls/  # JTL result files
 ```
 
 ## Properties Configuration
 
 The test configuration is managed through `test.properties` file. Here are the key properties you need to configure:
-
-> **📝 Note:** The properties in Number are just for reference, currently you have to put the actual values in your test (Check the Performance<your_project_application>Test).
 
 ### Server Properties
 ```properties
@@ -59,11 +58,9 @@ one_user.csv=resources/<file_name>.csv
 ### User Credentials Format
 CSV files contain user credentials in the format: `username,password`
 
-Example (`users_server.csv`):
+Example (`users.csv`):
 ```csv
-username,password
-username2,password2
-username3,password3
+user1,passwordForUser1
 ```
 
 ### CSV Data Set Configuration in Code
@@ -80,7 +77,7 @@ csvDataSet(csvFilePath)
 
 Your credential files contain sensitive information and should **never** be committed to version control. Here are several approaches to manage them securely:
 
-> **📝 Note:** This is just the example how files are currently being used in a project. There're multiple ways to handle Credentials, other solutions are possible.
+> **📝 Note:** This is just the example how files could be used in a project. There're multiple ways to handle Credentials, other solutions are possible.
 
 **Jenkins Secret Files**
 1. Go to Jenkins → Manage Jenkins → Manage Credentials
