@@ -281,7 +281,7 @@ mvn clean test -Dtest=DemoTest
 
 ## Quick Setup Guide
 1. **Clone the repository**
-2. **Run the test**
+2. **Run the test (`java-jmeterdsl-load-test-reference\java-jmeterdsl-load-test-reference-demo\pom.xml`)**
 ```bash
 mvn clean test -Dtest=DemoTest
 # mvn clean test -Dtest=PerformancePortalTest
