@@ -5,7 +5,7 @@
   <groupId>com.axonivy.market</groupId>
   <artifactId>java-jmeterdsl-load-test-reference-demo</artifactId>
   <version>14.0.0-SNAPSHOT</version>
-  <packaging>iar</packaging>
+  <!-- <packaging>iar</packaging> -->
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
@@ -56,15 +56,16 @@
   
   </dependencies>
   <build>
-    <plugins>
+    <!-- <plugins>
       <plugin>
         <groupId>com.axonivy.ivy.ci</groupId>
         <artifactId>project-build-plugin</artifactId>
         <version>${project.build.plugin.version}</version>
         <extensions>true</extensions>
       </plugin>
-    </plugins>
+    </plugins> -->
 
+    <testSourceDirectory>src_test</testSourceDirectory>
     <pluginManagement>
       <plugins>
         <!-- We force to use the latest version of surefire plugin 
