@@ -14,8 +14,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-<!-- 
-  <pluginRepositories>
+
+  <!-- <pluginRepositories>
     // Snapshot releases are available via sonatype.org
     <pluginRepository>
       <id>sonatype</id>
@@ -24,8 +24,8 @@
         <updatePolicy>always</updatePolicy>
       </snapshots>
     </pluginRepository>
-  </pluginRepositories>
- -->
+  </pluginRepositories> -->
+
 
   <dependencies>
     <dependency>
