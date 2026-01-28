@@ -22,8 +22,6 @@ public class PerformancePortalTestReviewInGui {
   }
 
   private void runPortalTest(int numberOfUsers, int rampUpPeriod, String testName, String csvFilePath) throws IOException, InterruptedException, TimeoutException {
-    String jtlDirName = String.format("target/jtls/%s", timestamp);
-
     testPlan(
       threadGroup(testName)
         .rampTo(numberOfUsers,                 // Number of users
@@ -176,10 +174,7 @@ public class PerformancePortalTestReviewInGui {
             .children(
               responseAssertion().fieldToTest(TargetField.RESPONSE_CODE).equalsToStrings("200")
             )
-        ),
-
-      jtlWriter(jtlDirName, testName + ".jtl"),
-      htmlReporter("target/html-report/" + testName)
+        )
     ).showInGui();
   }
 }
