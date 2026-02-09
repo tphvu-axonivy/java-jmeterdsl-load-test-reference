@@ -62,8 +62,4 @@ mvn clean test -Dtest=DemoTest
 
 ### Configuration
 
-Configure your test via `resources/test.properties`:
-
-```
-@variables.yaml@
-```
+Configure your test via `resources/test.properties`
