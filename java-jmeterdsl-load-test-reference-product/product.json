@@ -1,13 +1,14 @@
 {
   "$schema": "https://json-schema.axonivy.com/market/10.0.0/product.json",
+  "minimumIvyVersion": "13.2.0",
   "installers": [
     {
       "id": "maven-import",
       "data": {
         "projects": [
           {
-            "groupId": "MY-GROUP-ID",
-            "artifactId": "MY-PRODUCT-NAME-demo",
+            "groupId": "com.axonivy.market",
+            "artifactId": "java-jmeterdsl-load-test-reference-demo",
             "version": "${version}",
             "type": "iar"
           }
@@ -28,31 +29,10 @@
       "data": {
         "dependencies": [
           {
-            "groupId": "MY-GROUP-ID",
-            "artifactId": "MY-PRODUCT-NAME",
+            "groupId": "com.axonivy.market",
+            "artifactId": "java-jmeterdsl-load-test-reference",
             "version": "${version}",
             "type": "iar"
-          }
-        ],
-        "repositories": [
-          {
-            "id": "maven.axonivy.com",
-            "url": "https://maven.axonivy.com",
-            "snapshots": {
-              "enabled": "true"
-            }
-          }
-        ]
-      }
-    }, 
-    {
-      "id": "maven-dropins",
-      "data": {
-        "dependencies": [
-          {
-            "groupId": "MY-GROUP-ID",
-            "artifactId": "MY-PRODUCT-NAME",
-            "version": "${version}"
           }
         ],
         "repositories": [
